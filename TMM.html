@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Movie Collection</title>
+	<link rel="stylesheet" href="include/jquery.mobile-1.4.5.min.css">
+	<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+	<script type="text/javascript" src="include/jquery.mobile-1.4.5.min.js"></script>
+	<script type="text/javascript" src="include/indexOf.js"></script>
+	<script>
+	var allMovies = [];
+	var genreList = [];
+	</script>
+	<style>
+	table {width:100%;padding:0px;}
+	a:hover {background-color:rgb(0,240,0);}
+	div.img:hover {border: 1px solid rgb(0,240,0);}
+	div.img {background-position: 50% 50%; background-repeat:no-repeat;background-size:cover;border:1px solid #ccc;position:relative;z-index:0;}
+	div.img img {width:100%;height:auto;}
+	div.desc{font-size:60%;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:5px;}
+	.ribbon {
+	  position: absolute;
+	  left: -5px; top: -5px;
+	  z-index: 1;
+	  overflow: hidden;
+	  width: 75px; height: 75px;
+	  text-align: right;
+	  opacity:0.90;filter: alpha(opacity=90);
+	}
+	.ribbon span {
+	  font-size: 10px;
+	  font-weight: bold;
+	  color: #FFF;
+	  text-align: center;
+	  line-height: 20px;
+	  transform: rotate(-45deg);
+	  -webkit-transform: rotate(-45deg);
+	  width: 100px;
+	  display: block;
+	  background: #79A70A;
+	  background: linear-gradient(#9BC90D 0%, #79A70A 100%);
+	  box-shadow: 0 3px 10px -5px rgba(0, 0, 0, 1);
+	  position: absolute;
+	  top: 19px; left: -21px;
+	  text-shadow: none;
+	}
+	.ribbon span::before {
+	  content: "";
+	  position: absolute; left: 0px; top: 100%;
+	  z-index: -1;
+	  border-left: 3px solid #79A70A;
+	  border-right: 3px solid transparent;
+	  border-bottom: 3px solid transparent;
+	  border-top: 3px solid #79A70A;
+	}
+	.ribbon span::after {
+	  content: "";
+	  position: absolute; right: 0px; top: 100%;
+	  z-index: -1;
+	  border-left: 3px solid transparent;
+	  border-right: 3px solid #79A70A;
+	  border-bottom: 3px solid transparent;
+	  border-top: 3px solid #79A70A;
+	}
+	* {box-sizing: border-box;}
+
+
+a.more{
+    color: #fff;
+    background-color:rgba(25,25,25,0.5);
+}
+.movieinfo{
+   padding:15px;
+   font-size:90%;
+
+}
+
+
+	/* For mobile phones: */
+	.responsive {
+		padding: 3px;
+		float: left;
+		width: 24.5%;
+	    }
+	/* For tablets: */
+	@media only screen and (min-width: 600px){
+	    .responsive {
+		width: 19.5%;
+	    }
+	}
+	/* For desktop: */
+	@media only screen and (min-width: 768px){
+	    .responsive {
+		    width: 11%;
+	    }
+
+	}
+	.clearfix:after {
+	    content: "";
+	    display: table;
+	    clear: both;
+	}
+
+
+
+	</style>
+
+</head>
+<body>
+
+<!--/ Movies Search Page -->
+<div data-role="page" data-theme="b" id="AllMovies" data-title="Search Movies">
+	<div data-role="content">
+	<form method="get" id="searchForm" name="searchForm">
+	<fieldset data-role="collapsible">
+        	<legend>Filter <span id="total"></span>Movies</legend>
+		<table>
+		<tr>
+			<td><input type="text" name="moviename" id="moviename" placeholder="Movie" data-mini="true" data-theme="a" /></td>
+			<td><input type="text" name="actorname" id="actorname" placeholder="Actor" data-mini="true" data-theme="a" /></td>
+		</tr>
+		<tr>
+			<td><select name="search_newmovie" id="search_newmovie" data-mini="true" data-theme="a">
+					<option value="">--Select Status--</option>
+					<option value="yes">Not Watched</option>
+					<option value="no">Watched</option>
+				</select></td>
+			<td><select name="search_path" id="search_path" data-mini="true" data-theme="a">
+					<option value="">--Must See?--</option>
+					<option value="yes">Yes</option>	
+					<option value="no">No</option>
+				</select></td>
+		</tr>
+		<tr>
+			<td><select name="search_genres" id="search_genres" data-mini="true" data-theme="a">
+					<option value="">--Select Genre--</option>
+				</select></td>
+			<td><select name="search_rating" id="search_rating" data-mini="true" data-theme="a">
+					<option value="">--Select Rating--</option>
+					<option value="R">R</option>
+					<option value="PG-13">PG-13</option>
+					<option value="PG">PG</option>
+					<option value="G">G</option>
+				</select></td>
+		</tr>
+		<tr>
+			<td colspan="2">
+			<table><tr><td><input type="button" name="submit" id="filter" value="Filter" data-mini="true" data-theme="a" onclick="return goSearch()" /></td>
+			<td><input type="button" name="submit" id="reset" value="Reset" data-mini="true" data-theme="a" onclick="return goReset()" /></td>
+			<td><input type="button" name="random" id="random" value="Random" data-mini="true" onclick="return goRandom()" /></td></tr></table>
+		</tr>
+		</table>
+	 </fieldset>
+	</form>
+	<form id="searchResults" name="searchResults">
+
+		<div class="responsive" id="resptt0092086">
+			<a href="#idtt0092086" class="more" data-rel="popup" data-transition="pop" title="
+
+                        &iexcl;Three Amigos! : 102 min
+
+1986 (PG)  -  Comedy  Adventure  Western ">
+				<div class="img" style="background-image:url('images/%C2%A1Three%20Amigos%21%20%281986%29%201080p%20DTSHD-MA-POSTER.thumb.jpg')">
+				<div class="ribbon"><span>UNWATCHED</span></div>
+				<img src="include/images/spacer.png" alt="&iexcl;Three Amigos!" style="opacity:0.0;filter: alpha(opacity=0);">
+				</div>
+			</a>
+                        		<div class="desc">
+                                        <!--   target="_blank" href="http://www.imdb.com/title/tt0092086" -->
+                                             <a  target="_blank" href="http://www.imdb.com/title/tt0092086">&iexcl;Three Amigos!</a>
+                                        </div>
+
+                                        <div data-role="popup" id="idtt0092086" class="movieinfo">
+
+                                             <h3>&iexcl;Three Amigos! (&iexcl;Three Amigos!)</h3>
+
+                                             <h4>1986 (PG)  -  Comedy  Adventure  Western     </h4>
+
+                                             <p>Three unemployed actors accept an invitation to a Mexican village to replay their bandit fighter roles, unaware that it is the real thing.</p>
+
+                                             <p>\\SERVER01\Movies03\The Three Amigos (1986) </p>
+                                        </div>
+
+
+
+			<script>allMovies[allMovies.length] = "tt0092086";if (genreList.indexOf("Comedy") < 0){genreList[genreList.length] = "Comedy";}if (genreList.indexOf("Adventure") < 0){genreList[genreList.length] = "Adventure";}if (genreList.indexOf("Western") < 0){genreList[genreList.length] = "Western";}</script>
+			<input type="hidden" id="search_id" value="tt0092086">
+			<input type="hidden" id="search_moviename" value="&iexcl;Three Amigos!"> 
+			<input type="hidden" id="search_actorname" value="Chevy Chase,Steve Martin,Martin Short,Alfonso Arau,Tony Plana,Patrice Martinez,Jorge Cervera Jr.,Kai Wulff,Abel Franco,Fred Asparagus,Jon Lovitz,Joe Mantegna,Philip Gordon,Phil Hartman,Norbert Weisser,Brian Thompson,Dyana Ortelli,Rebecca Ferratti,Brinke Stevens,Michael Wren,Gene Hartline,William B. Kaplan,Sophia Lamour,Santos Morales,Tino Insana,Craig Berenson,Joshua Gallegos,Hector Elias,Humberto Ortiz,Alfonso Ar&aacute;u">
+			<input type="hidden" id="search_newmovie" value="yes">
+			<input type="hidden" id="search_path" value="\\SERVER01\Movies03\The Three Amigos (1986)">
+			<input type="hidden" id="search_genres" value="[Comedy, Adventure, Western]">
+			<input type="hidden" id="search_rating" value="PG">	
+		</div>	
+
+		<div class="responsive" id="resptt0049189">
+			<a href="#idtt0049189" class="more" data-rel="popup" data-transition="pop" title="
+
+                        ...And God Created Woman : 95 min
+
+1956 (PG)  -  Drama  Romance ">
+				<div class="img" style="background-image:url('images/And%20God%20Created%20Woman%20%281956%29%20480p%20AC3-POSTER.thumb.jpg')">
+				<div class="ribbon"><span>UNWATCHED</span></div>
+				<img src="include/images/spacer.png" alt="...And God Created Woman" style="opacity:0.0;filter: alpha(opacity=0);">
+				</div>
+			</a>
+                        		<div class="desc">
+                                        <!--   target="_blank" href="http://www.imdb.com/title/tt0049189" -->
+                                             <a  target="_blank" href="http://www.imdb.com/title/tt0049189">...And God Created Woman</a>
+                                        </div>
+
+                                        <div data-role="popup" id="idtt0049189" class="movieinfo">
+
+                                             <h3>...And God Created Woman (Et Dieu&hellip; cr&eacute;a la femme)</h3>
+
+                                             <h4>1956 (PG)  -  Drama  Romance     </h4>
+
+                                             <p>Juliette Hardy is sexual dynamite, and has the men of a French coastal town panting. But Antoine, the only man who affects her likewise, wouldn't dream of settling down with a woman his friends consider the town tramp.</p>
+
+                                             <p>\\SERVER01\Movies01\And God Created Woman (1956) </p>
+                                        </div>
+
+
+
+			<script>allMovies[allMovies.length] = "tt0049189";if (genreList.indexOf("Drama") < 0){genreList[genreList.length] = "Drama";}if (genreList.indexOf("Romance") < 0){genreList[genreList.length] = "Romance";}</script>
+			<input type="hidden" id="search_id" value="tt0049189">
+			<input type="hidden" id="search_moviename" value="...And God Created Woman"> 
+			<input type="hidden" id="search_actorname" value="Brigitte Bardot,Jean-Louis Trintignant,Curd J&uuml;rgens,Jane Marken,Jean Tissier,Isabelle Corey,Jacqueline Ventura,Christian Marquand,Georges Poujouly,Jean Lefebvre,Jacques Ciron,Paul Faivre,Marie Glory,L&eacute;opoldo Franc&egrave;s">
+			<input type="hidden" id="search_newmovie" value="yes">
+			<input type="hidden" id="search_path" value="\\SERVER01\Movies01\And God Created Woman (1956)">
+			<input type="hidden" id="search_genres" value="[Drama, Romance]">
+			<input type="hidden" id="search_rating" value="PG">	
+		</div>	
+
+		<div class="responsive" id="resptt0096734">
+			<a href="#idtt0096734" class="more" data-rel="popup" data-transition="pop" title="
+
+                        The 'Burbs : 102 min
+
+1989 (PG)  -  Comedy  Horror  Thriller ">
+				<div class="img" style="background-image:url('images/The%20%27Burbs%20%281989%29%201080p%20DTSHD-MA-POSTER.thumb.jpg')">
+				<div class="ribbon"><span>UNWATCHED</span></div>
+				<img src="include/images/spacer.png" alt="The 'Burbs" style="opacity:0.0;filter: alpha(opacity=0);">
+				</div>
+			</a>
+                        		<div class="desc">
+                                        <!--   target="_blank" href="http://www.imdb.com/title/tt0096734" -->
+                                             <a  target="_blank" href="http://www.imdb.com/title/tt0096734">The 'Burbs</a>
+                                        </div>
+
+                                        <div data-role="popup" id="idtt0096734" class="movieinfo">
+
+                                             <h3>The 'Burbs (The 'Burbs)</h3>
+
+                                             <h4>1989 (PG)  -  Comedy  Horror  Thriller     </h4>
+
+                                             <p>When secretive new neighbors move in next door, suburbanite Ray Peterson and his friends let their paranoia get the best of them as they start to suspect the newcomers of evildoings and commence an investigation. But it's hardly how Ray, who much prefers drinking beer, reading his newspaper and watching a ball game on the tube expected to spend his vacation.</p>
+
+                                             <p>\\SERVER01\Movies02\The Burbs (1989) </p>
+                                        </div>
+
+
+
+			<script>allMovies[allMovies.length] = "tt0096734";if (genreList.indexOf("Comedy") < 0){genreList[genreList.length] = "Comedy";}if (genreList.indexOf("Horror") < 0){genreList[genreList.length] = "Horror";}if (genreList.indexOf("Thriller") < 0){genreList[genreList.length] = "Thriller";}</script>
+			<input type="hidden" id="search_id" value="tt0096734">
+			<input type="hidden" id="search_moviename" value="The 'Burbs"> 
+			<input type="hidden" id="search_actorname" value="Tom Hanks,Bruce Dern,Carrie Fisher,Rick Ducommun,Wendy Schaal,Corey Feldman,Courtney Gains,Henry Gibson,Gale Gordon,Dick Miller,Robert Picardo,Theodore Gottlieb,Franklyn Ajaye,Cory Danziger,Rance Howard,Heather Haase,Nicky Katt,Bill Stevenson,Gary Hays,Kevin Gage,Dana Olsen,Brenda Benner,Patrika Darbo,Sonny Carl Davis,Moosie Drier,Leigh French,Archie Hahn,Billy Jayne,Phyllis Katz,Jeffrey Kramer,Lynne Marie Stewart,Arnold F. Turner,Gigi Vorgan,Carey Scott,Tony Westbrook,Darla,Billy Stevenson">
+			<input type="hidden" id="search_newmovie" value="yes">
+			<input type="hidden" id="search_path" value="\\SERVER01\Movies02\The Burbs (1989)">
+			<input type="hidden" id="search_genres" value="[Comedy, Horror, Thriller]">
+			<input type="hidden" id="search_rating" value="PG">	
+		</div>	
+
+	<div class="clearfix"></div>
+	</form>
+	</div>
+	<div data-role="footer" data-position="fixed" id="footer">
+		 <h2 id="numMovies"></h2>
+	</div>
+</div>
+
+<script>
+//update footer with the number of movies
+document.getElementById("numMovies").innerHTML=allMovies.length+" Movies";
+document.getElementById("total").innerHTML=allMovies.length+" ";
+$(document).ready(function(){
+	//update genre selectable menu
+	genreList.sort();
+	for (var i=0; i<genreList.length; i++){
+		$('#search_genres').append('<option value="'+genreList[i]+
+		'">'+genreList[i]+'</option>');
+	 }
+	 $("#search_genres").trigger("change");
+}); 
+function goSearch(){
+	var srchForm = document.searchForm;
+	var srchMovieName = srchForm.moviename.value.toLowerCase();
+	var srchActorName = srchForm.actorname.value.toLowerCase();
+	var srchNewMovie = srchForm.search_newmovie.value;
+	var srchMustSee = srchForm.search_path.value;
+	var srchRating = srchForm.search_rating.value;
+	var srchGenre = srchForm.search_genres.value.toLowerCase();
+	
+	var srchResults = document.searchResults;
+	var movieID,respID,displayMovie;
+	var iMovies = allMovies.length;
+	for (i=0;i<allMovies.length;i++){
+		movieID = srchResults.search_id[i].value;
+		respID = document.getElementById("resp"+movieID);
+		respID.style.display = "inline";
+		displayMovie = 1;
+		//movie name search
+		if (srchMovieName.length > 0){
+			//if movie name doesn't match, hide it.		
+			if (srchResults.search_moviename[i].value.toLowerCase().indexOf(srchMovieName) < 0){
+				displayMovie = 0;
+			}
+		}
+		//actor name search
+		if (srchActorName.length > 0){
+			//if actor name doesn't match, hide it.		
+			if (srchResults.search_actorname[i].value.toLowerCase().indexOf(srchActorName) < 0){
+				displayMovie = 0;
+			}
+		}
+		//watched, unwatched or all movies
+		if (srchNewMovie.length > 0){
+			//looking for only unwatched and movie is unwatched or watched and movie is watched		
+			if (srchNewMovie != srchResults.search_newmovie[i].value){
+				displayMovie = 0;
+			}
+		}
+		//must see movies
+		if (srchMustSee.length > 0){
+			//looking for only must see movies and movie is must see or not must see movies and movie is not a must see	
+			if ((srchMustSee == "yes" && srchResults.search_path[i].value.indexOf("Must See") < 0) || (srchMustSee == "no" && srchResults.search_path[i].value.indexOf("Must See") >= 0)){
+				displayMovie = 0;
+			}
+		}
+		//rating
+		if (srchRating.length > 0){
+			//looking for only movies of a certain rating
+			if (srchRating != srchResults.search_rating[i].value){
+				displayMovie = 0;
+			}
+		}
+		//genres
+		if (srchGenre.length > 0){
+			//looking for only movies of a certain genre		
+			if (srchResults.search_genres[i].value.toLowerCase().indexOf(srchGenre) < 0){
+				displayMovie = 0;
+			}
+		}
+		if (displayMovie == 0){
+			respID.style.display = "none";
+			iMovies = iMovies - 1;
+		}
+	}
+	document.getElementById("numMovies").innerHTML=iMovies+" Movies";
+	$("#footer").trigger("updatelayout");
+}
+function goReset(){
+	var srchForm = document.searchForm;
+	srchForm.moviename.value = "";
+	srchForm.actorname.value = "";
+	srchForm.search_newmovie.value = "";
+	srchForm.search_path.value = "";
+	srchForm.search_rating.value = "";
+	srchForm.search_genres.value = "";
+	var srchResults = document.searchResults;
+	for (i=0;i<allMovies.length;i++){
+		movieID = srchResults.search_id[i].value;
+		respID = document.getElementById("resp"+movieID);
+		respID.style.display = "inline";
+	}
+	document.getElementById("numMovies").innerHTML=allMovies.length+" Movies";
+	$("#footer").trigger("updatelayout");
+}
+function goRandom(){
+	var arRandom = [];
+	var srchResults = document.searchResults;
+	var movieID;
+	for (i=0;i<allMovies.length;i++){
+		movieID = srchResults.search_id[i].value;
+		respID = document.getElementById("resp"+movieID);
+		respID.style.display = "none";
+		if (srchResults.search_path[i].value.indexOf("Must See") >= 0){
+			arRandom[arRandom.length] = respID;
+		}
+	}
+	var random = Math.floor(Math.random() * (arRandom.length));
+	arRandom[random].style.display = 'inline';
+	$("#footer").trigger("updatelayout");
+}
+</script>
+</body>
+</html>
